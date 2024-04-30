@@ -26,27 +26,27 @@ services:
       - DATABASE_URL=${AUTH_DATABASE_URL}
       - JWT_SECRET=${AUTH_JWT_SECRET}
 
-  products-ms:
-    build:
-      context: ./products-ms
-      dockerfile: dockerfile.prod
-    image: products-ms-prod
-    environment:
-      - PORT=3000
-      - NATS_SERVERS=${NATS_SERVERS}
-      - DATABASE_URL=${PRODUCTS_DATABASE_URL}
+  # products-ms:
+  #   build:
+  #     context: ./products-ms
+  #     dockerfile: dockerfile.prod
+  #   image: products-ms-prod
+  #   environment:
+  #     - PORT=3000
+  #     - NATS_SERVERS=${NATS_SERVERS}
+  #     - DATABASE_URL=${PRODUCTS_DATABASE_URL}
 
-  orders-ms:
-    build:
-      context: ./orders-ms
-      dockerfile: dockerfile.prod
-      args:
-        - ORDERS_DATABASE_URL=${ORDERS_DATABASE_URL}
-    image: orders-ms-prod
-    environment:
-      - PORT=3000
-      - NATS_SERVERS=${NATS_SERVERS}
-      - DATABASE_URL=${ORDERS_DATABASE_URL}
+  # orders-ms:
+  #   build:
+  #     context: ./orders-ms
+  #     dockerfile: dockerfile.prod
+  #     args:
+  #       - ORDERS_DATABASE_URL=${ORDERS_DATABASE_URL}
+  #   image: orders-ms-prod
+  #   environment:
+  #     - PORT=3000
+  #     - NATS_SERVERS=${NATS_SERVERS}
+  #     - DATABASE_URL=${ORDERS_DATABASE_URL}
 
   payments-ms:
     build:
