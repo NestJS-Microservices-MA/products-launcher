@@ -4,18 +4,18 @@ services:
   nats-server:
     image: nats:latest
     ports:
-      - 8222:8222
+      - 8222:8222 # HTTP monitoring port - only or dev
 
   client-gateway:
     build: ./client-gateway
     ports:
-      - ${CLIENT_GATEWAY_PORT}:3000
+      - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
     volumes:
       - ./client-gateway/src:/usr/src/app/src
     command: npm run start:dev
     environment:
-      - PORT=3000
-      - NATS_SERVERS=nats://nats-server:4222
+      - PORT=${CLIENT_GATEWAY_PORT}
+      - NATS_SERVERS=${NATS_SERVERS}
 
   products-ms:
     build: ./products-ms
@@ -26,8 +26,8 @@ services:
     command: npm run start:dev
     environment:
       - PORT=3001
-      - NATS_SERVERS=nats://nats-server:4222
-      - DATABASE_URL=file:./dev.db
+      - NATS_SERVERS=${NATS_SERVERS}
+      - DATABASE_URL=${PRODUCTS_DATABASE_URL}
 
   orders-ms:
     depends_on:
@@ -40,8 +40,8 @@ services:
     command: npm run start:dev
     environment:
       - PORT=3002
-      - NATS_SERVERS=nats://nats-server:4222
-      - DATABASE_URL=postgresql://postgres:123456@orders-db:5432/ordersdb?schema-public
+      - NATS_SERVERS=${NATS_SERVERS}
+      - DATABASE_URL=${DEV_ORDERS_DATABASE_URL}
 
   orders-db:
     container_name: orders-db
@@ -50,11 +50,11 @@ services:
     volumes:
       - ./orders-ms/postgres:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - ${DEV_ORDERS_DATABASE_POSTGRES_PORT}:${DEV_ORDERS_DATABASE_POSTGRES_PORT}
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=123456
-      - POSTGRES_DB=ordersdb
+      - POSTGRES_USER=${DEV_ORDERS_DATABASE_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DEV_ORDERS_DATABASE_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${DEV_ORDERS_DATABASE_POSTGRES_DB}
 
   payments-ms:
     build: ./payments-ms
@@ -65,7 +65,7 @@ services:
     command: npm run start:dev
     environment:
       - PORT=${PAYMENTS_MS_PORT}
-      - NATS_SERVERS=nats://nats-server:4222
+      - NATS_SERVERS=${NATS_SERVERS}
       - STRIPE_SECRET=${STRIPE_SECRET}
       - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
       - STRIPE_CANCEL_URL=${STRIPE_CANCEL_URL}
@@ -80,6 +80,6 @@ services:
     command: npm run start:dev
     environment:
       - PORT=3004
-      - NATS_SERVERS=nats://nats-server:4222
+      - NATS_SERVERS=${NATS_SERVERS}
       - DATABASE_URL=${AUTH_DATABASE_URL}
       - JWT_SECRET=${AUTH_JWT_SECRET}
